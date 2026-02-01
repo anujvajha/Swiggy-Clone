@@ -22,6 +22,28 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     select: false
+  },
+  cart : 
+  {
+    type: 
+    [
+      {
+        order: 
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'order',
+          required: true
+        },
+        quantity:
+        {
+          type: Number,
+          default: 1,
+          min: 1
+        }
+
+      }
+    ],
+    default: []
   }
 }, { timestamps: true });
 
@@ -36,5 +58,5 @@ userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model("user", userSchema);
 export default User;
