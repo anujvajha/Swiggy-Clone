@@ -1,4 +1,4 @@
-import Cart from "../model/Cart.js"
+import Cart from "../models/Cart.js"
 
 
 //controller function to add to cart it first checks if a cart with the userId in request exists if not then makes a cart with for that userId and fills the attributes with the necessary data if cart already exists then it checks whether the food item (items.foodId) already exists in the cart or not and then if it doesnt then adds that item with all the attributes into the cart if the item already exists then updates it's quantity and finally updates the total_Price by adding the price of each item again and again borderline it handles every request essentially 
