@@ -69,13 +69,31 @@ export const login = async (req, res) => {
         expiresAt: new Date(Date.now() + ms(process.env.JWT_REFRESH_TOKENS))
     });
 
-    res.json({ token, refreshToken });
+    res.cookie("accessToken",token,{
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: ms(process.env.JWT_EXPIRES_IN)
+    })
+
+    res.cookie("refreshToken",refreshToken,{
+        httpOnly:true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite:"lax",
+        maxAge: ms(process.env.JWT_REFRESH_TOKENS),
+    })
+
+    //remove this from json later
+    res.json({ token, refreshToken, message: "Success stored in cookie" });
 }
 
 //will generate new access token
 export const refresh = async (req, res) => {
 
-    const { refreshToken } = req.body;
+    // const { refreshToken } = req.body;
+    // const authHeader = req.headers.authorization;
+    const refreshToken = req.cookies.refreshToken;
+    // const accessToken = req.cookies.accessToken;
 
     if (!refreshToken) {
         return res.status(401).json({ message: "Refresh token required " });
@@ -92,10 +110,16 @@ export const refresh = async (req, res) => {
             process.env.JWT_SECRET,
             {expiresIn : process.env.JWT_EXPIRES_IN}
         );
-
-        res.json({token: newAccessToken});
+        res.cookie("accessToken",newAccessToken,{
+            httpOnly:true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite:"lax",
+            maxAge: ms(process.env.JWT_EXPIRES_IN),
+        })
+        res.json({message:"The token successfully send"});
     } catch(e){
         await RefreshToken.deleteOne({ token: refreshToken});
+        res.clearCookie("accessToken");
         return res.status(403).json({message: "Refresh token expired"});
     }
 
@@ -103,8 +127,9 @@ export const refresh = async (req, res) => {
 
 //logout
 export const logout = async (req,res)=>{
-    const { refreshToken }=req.body;
-    console.log("in logout ")
+    // const { refreshToken }=req.body;
+    const refreshToken = req.cookies.refreshToken;
+    res.clearCookie("accessToken");
     await RefreshToken.deleteOne({ token: refreshToken});
 
     res.json({message: "Logged out successfully "});
