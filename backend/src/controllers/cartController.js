@@ -5,7 +5,8 @@ import Cart from "../models/Cart.js"
 
 
 export const addToCart = async (req, res) => {
-    const {userId, restaurantId, foodId, name, price } = req.body
+    const userId = req.userId;
+    const { restaurantId, foodId, name, price } = req.body
 
 
     try {
@@ -56,12 +57,12 @@ export const removeFromCart = async (req, res) => {
         const cart = await Cart.findOne({userId})
         if(!cart) {return res.status(404).json({message:"Cart not found!"})}
 
-        const ItemIndex = cart.items.findbyIndex(
-            item => items.foodId.toString() == foodId
+        const ItemIndex = cart.items.findIndex(
+            item => items.foodId.equals(foodId)
         )
 
         if(ItemIndex === -1 ){
-            return res.staus(404).json({message:"Food Item not found!"})
+            return res.status(404).json({message:"Food Item not found!"})
         }
 
         const item = cart.items[ItemIndex]
@@ -86,7 +87,7 @@ export const removeFromCart = async (req, res) => {
 //get cart 
 
 export const getCart = async (req, res) => {
-    const {userId} = req.body
+    const {userId} = req.params
 
     try {
         const cart = await Cart.findOne({userId})

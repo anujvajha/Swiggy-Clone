@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Restaurant from "./Restaurant";
+import Restaurant from "./Restaurant.js";
 
 
 const tableSchema = new mongoose.Schema({
@@ -16,4 +16,4 @@ const tableSchema = new mongoose.Schema({
 
 })
 
-export default mongoose.model("Table", TableSchema)
+export default mongoose.model("Table", tableSchema)
